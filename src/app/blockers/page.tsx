@@ -54,8 +54,17 @@ export default function BlockersPage() {
 
   function handleContinue() {
     if (!allAnswered) return;
-    if (anyYes) {
-      setState((prev) => ({ ...prev, forcedVariant: "V0-Desk" }));
+    const yesAnswers = ["q1", "q2", "q3", "q4", "q5"].filter(
+      (k) => blockers[k] === "yes"
+    );
+    if (yesAnswers.includes("q3") || yesAnswers.includes("q4")) {
+      setState((prev) => ({ ...prev, forcedVariant: "ESCALATE" }));
+      router.push("/result");
+    } else if (yesAnswers.includes("q5")) {
+      setState((prev) => ({ ...prev, forcedVariant: "Full" }));
+      router.push("/result");
+    } else if (yesAnswers.includes("q1") || yesAnswers.includes("q2")) {
+      setState((prev) => ({ ...prev, forcedVariant: "V3" }));
       router.push("/result");
     } else {
       router.push("/picker");

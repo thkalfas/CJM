@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useAssessment } from "@/context/AssessmentContext";
-import { calculateVariant, getModifierRows } from "@/lib/logic";
+import { calculateVariant, getModifierRows, VARIANT_META } from "@/lib/logic";
 import TopBar from "@/components/TopBar";
 import BottomNav from "@/components/BottomNav";
 import { clsx } from "clsx";
@@ -44,9 +44,9 @@ const recruitOptions: {
   sub: string;
   shift: string;
 }[] = [
-  { value: "yes", label: "Yes Ready", sub: "List & Consent ready", shift: "No shift" },
-  { value: "uncertain", label: "Uncertain", sub: "List but no consent", shift: "-1 Variant" },
-  { value: "no", label: "Not Available", sub: "Can't recruit in time", shift: "Reset to V0" },
+  { value: "yes", label: "Yes Ready", sub: "List & Consent ready", shift: "No shift required" },
+  { value: "uncertain", label: "Uncertain", sub: "List exists, no consent yet", shift: "Step DOWN one variant" },
+  { value: "no", label: "Not Available", sub: "Can't recruit in time", shift: "Step DOWN to V3" },
 ];
 
 const personaOptions: {
@@ -57,7 +57,7 @@ const personaOptions: {
 }[] = [
   { value: 1, label: "1", sub: "Persona", shift: "No shift required" },
   { value: 2, label: "2", sub: "Personas", shift: "+1 Variant Boost" },
-  { value: 3, label: "3+", sub: "Personas", shift: "Upgrade to Full" },
+  { value: 3, label: "3+", sub: "Personas", shift: "Step UP to Full" },
 ];
 
 export default function RealityPage() {
@@ -284,7 +284,7 @@ export default function RealityPage() {
                     Adjusted Outcome
                   </p>
                   <h4 className="text-4xl text-on-secondary-fixed-variant mt-2 font-extrabold font-[family-name:var(--font-sora)]">
-                    {allAnswered ? variant : "—"}
+                    {allAnswered ? (VARIANT_META[variant]?.label ?? variant) : "—"}
                   </h4>
                 </div>
                 <div className="bg-secondary p-3 rounded-xl shadow-lg">
@@ -308,8 +308,8 @@ export default function RealityPage() {
                             : "check_circle"}
                       </span>
                       <span className="text-on-secondary-fixed-variant font-bold text-sm">
-                        {mod.description} ({mod.shift > 0 ? "+" : ""}
-                        {mod.shift === -99 ? "force V0" : mod.shift})
+                        {mod.note} ({mod.shift > 0 ? "+" : ""}
+                        {mod.shift === -99 ? "force V3" : mod.shift})
                       </span>
                     </div>
                   ))}

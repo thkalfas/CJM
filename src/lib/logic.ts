@@ -1,96 +1,116 @@
-import { AssessmentState } from "./types";
+import { AssessmentState, Variant } from "./types";
 
-const VARIANT_LADDER = ["V0-Desk", "V1-Lean", "V2-Standard", "V3-Full"] as const;
+export const VARIANT_LADDER: Variant[] = ["V3", "V2", "V1", "Full"];
+
+export type PickerResult = Variant | "RESCOPE_STEPUP" | "RESCOPE_DONT_TAKE";
+
+const PICKER_MATRIX: Record<string, Record<string, PickerResult>> = {
+  long: { internal: "V1", strategic: "Full", deliverable: "Full" },
+  medium: { internal: "V1", strategic: "V1", deliverable: "V1" },
+  short: { internal: "V2", strategic: "V2", deliverable: "RESCOPE_STEPUP" },
+  sprint: { internal: "V3", strategic: "V3", deliverable: "RESCOPE_DONT_TAKE" },
+};
 
 export interface VariantMeta {
-  full: string;
+  label: string;
+  duration: string;
   descriptor: string;
   script: string;
 }
 
 export const VARIANT_META: Record<string, VariantMeta> = {
-  "V0-Desk": {
-    full: "V0-Desk Research",
-    descriptor: "desk research and internal synthesis",
+  Full: {
+    label: "Full",
+    duration: "15–20 days",
+    descriptor: "qualitative + quantitative evidence, AI-tested",
     script:
-      "Based on the constraints you’ve described, we’ll synthesize a CJM from existing internal knowledge and desk research. No primary research is conducted.",
+      "You'll get a CJM grounded in qualitative + quantitative evidence across multiple personas, with AI-tested recommendations.",
   },
-  "V1-Lean": {
-    full: "V1-Lean Diagnostic",
-    descriptor: "rapid validation with qualitative depth",
+  V1: {
+    label: "V1 — Lean",
+    duration: "4–6 days",
+    descriptor: "qualitatively-grounded, one persona",
     script:
-      "You’ll get a qualitatively-grounded CJM for one persona. Pain points are confirmed through customer interviews and existing data, but not quantified at scale. If you later want statistical validation, a Pollfish add-on is available.",
+      "You'll get a qualitatively-grounded CJM for one persona. Pain points are confirmed through customer interviews and existing data, but not quantified at scale. If you later want statistical validation, a Pollfish add-on is available.",
   },
-  "V2-Standard": {
-    full: "V2-Standard Discovery",
-    descriptor: "mixed-method research and survey validation",
+  V2: {
+    label: "V2 — Rapid",
+    duration: "2–3 days",
+    descriptor: "directional, limited interviews",
     script:
-      "We’ll map your personas using a mix of in-depth interviews and lightweight survey validation. You’ll get both qualitative texture and directional quantitative signal.",
+      "You'll get a directional CJM built from limited interviews and stakeholder input. It's appropriate as a strategic input or refresh. Any pain point not confirmed in interviews is flagged as a hypothesis requiring validation.",
   },
-  "V3-Full": {
-    full: "V3-Full Immersion",
-    descriptor: "full-scale quantitative and qualitative research",
+  V3: {
+    label: "V3 — Workshop",
+    duration: "≤ 1 day",
+    descriptor: "AS-IS hypothesis map, no primary research",
     script:
-      "This is our most rigorous approach — full primary research across your persona set, statistically validated at scale, with a Pollfish quantitative layer included.",
+      "You'll get an AS-IS hypothesis map — a cross-functional alignment artefact, not a research finding. The top 3 assumptions we couldn't validate will be flagged as candidates for a follow-up sprint.",
   },
 };
 
 export type VariantName = (typeof VARIANT_LADDER)[number];
 
-const BASE_INDEX: Record<NonNullable<AssessmentState["timeframe"]>, number> = {
-  long: 3,
-  medium: 2,
-  short: 1,
-  sprint: 0,
-};
-
 export interface ModifierRow {
   label: string;
   shift: number;
-  description: string;
+  note: string;
+}
+
+export function getBaseResult(
+  timeframe: NonNullable<AssessmentState["timeframe"]>,
+  outputUse: NonNullable<AssessmentState["outputUse"]>
+): PickerResult {
+  return PICKER_MATRIX[timeframe][outputUse];
 }
 
 export function getModifierRows(state: AssessmentState): ModifierRow[] {
   const rows: ModifierRow[] = [];
 
   // Client speed
-  if (state.clientSpeed === "fast") {
-    rows.push({ label: "Responsive client", shift: 0, description: "No shift" });
-  } else if (state.clientSpeed === "medium") {
-    rows.push({ label: "Medium responsiveness", shift: -1, description: "Step DOWN one" });
-  } else if (state.clientSpeed === "slow") {
-    rows.push({ label: "Slow / committee", shift: -2, description: "Step DOWN two" });
-  }
+  if (state.clientSpeed === "fast")
+    rows.push({ label: "Client responsiveness", shift: 0, note: "No shift" });
+  if (state.clientSpeed === "medium")
+    rows.push({ label: "Client responsiveness", shift: -1, note: "Step DOWN one variant" });
+  if (state.clientSpeed === "slow")
+    rows.push({ label: "Client responsiveness", shift: -2, note: "Step DOWN two variants" });
 
   // Recruitment
-  if (state.recruitment === "yes") {
-    rows.push({ label: "Recruitment ready", shift: 0, description: "No shift" });
-  } else if (state.recruitment === "uncertain") {
-    rows.push({ label: "Recruitment uncertain", shift: -1, description: "Step DOWN one" });
-  } else if (state.recruitment === "no") {
-    rows.push({ label: "Can't recruit", shift: -99, description: "Force V0-Desk" });
-  }
+  if (state.recruitment === "yes")
+    rows.push({ label: "Recruitment feasibility", shift: 0, note: "No shift" });
+  if (state.recruitment === "uncertain")
+    rows.push({ label: "Recruitment feasibility", shift: -1, note: "Step DOWN one variant" });
+  if (state.recruitment === "no")
+    rows.push({ label: "Recruitment feasibility", shift: -99, note: "Step DOWN to V3" });
 
   // Personas
-  if (state.personas === 1) {
-    rows.push({ label: "1 Persona", shift: 0, description: "No shift" });
-  } else if (state.personas === 2) {
-    rows.push({ label: "2 Personas", shift: 1, description: "Step UP one" });
-  } else if (state.personas === 3) {
-    rows.push({ label: "3+ Personas", shift: 2, description: "Step UP to Full" });
-  }
+  if (state.personas === 1)
+    rows.push({ label: "Persona coverage", shift: 0, note: "No shift" });
+  if (state.personas === 2)
+    rows.push({ label: "Persona coverage", shift: 1, note: "Step UP one variant" });
+  if (state.personas !== null && state.personas >= 3)
+    rows.push({ label: "Persona coverage", shift: 99, note: "Step UP to Full" });
 
   return rows;
 }
 
-export function calculateVariant(state: AssessmentState): string {
+export function calculateVariant(
+  state: AssessmentState
+): Variant | "ESCALATE" | "RESCOPE_STEPUP" | "RESCOPE_DONT_TAKE" {
   if (state.forcedVariant) return state.forcedVariant;
-  if (!state.timeframe) return VARIANT_LADDER[0];
+  if (!state.timeframe || !state.outputUse) return VARIANT_LADDER[0];
 
-  // Recruitment "no" forces V0-Desk
-  if (state.recruitment === "no") return "V0-Desk";
+  const base = getBaseResult(state.timeframe, state.outputUse);
 
-  let index = BASE_INDEX[state.timeframe];
+  if (base === "RESCOPE_STEPUP" || base === "RESCOPE_DONT_TAKE") return base;
+
+  // Recruitment "no" forces V3
+  if (state.recruitment === "no") return "V3";
+
+  // 3+ personas forces Full
+  if (state.personas === 3) return "Full";
+
+  let index = VARIANT_LADDER.indexOf(base);
 
   // Client speed
   if (state.clientSpeed === "medium") index -= 1;
@@ -101,7 +121,6 @@ export function calculateVariant(state: AssessmentState): string {
 
   // Personas
   if (state.personas === 2) index += 1;
-  if (state.personas === 3) index += 2;
 
   // Clamp
   index = Math.max(0, Math.min(3, index));

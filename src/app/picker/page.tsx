@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useAssessment } from "@/context/AssessmentContext";
+import { getBaseResult } from "@/lib/logic";
 import TopBar from "@/components/TopBar";
 import BottomNav from "@/components/BottomNav";
 import { clsx } from "clsx";
@@ -57,7 +58,12 @@ export default function PickerPage() {
   const router = useRouter();
   const { state, setState } = useAssessment();
 
-  const canContinue = state.timeframe !== null && state.outputUse !== null;
+  const bothSelected = state.timeframe !== null && state.outputUse !== null;
+  const pickerResult =
+    bothSelected ? getBaseResult(state.timeframe!, state.outputUse!) : null;
+  const isRescope =
+    pickerResult === "RESCOPE_STEPUP" || pickerResult === "RESCOPE_DONT_TAKE";
+  const canContinue = bothSelected && !isRescope;
 
   const timeLabel = timeOptions.find((t) => t.value === state.timeframe)?.label;
   const outputLabel = outputOptions.find((o) => o.value === state.outputUse)?.label;
@@ -188,6 +194,40 @@ export default function PickerPage() {
                 })}
               </div>
             </section>
+
+            {/* Rescope warnings */}
+            {pickerResult === "RESCOPE_STEPUP" && (
+              <div className="flex items-start gap-4 p-6 bg-amber-50 border-2 border-amber-400 rounded-xl">
+                <span className="material-symbols-outlined text-amber-600 text-2xl flex-shrink-0 mt-0.5">
+                  warning
+                </span>
+                <div>
+                  <h4 className="text-body-md font-bold text-amber-800 font-[family-name:var(--font-sora)] mb-1">
+                    Rescope Recommended
+                  </h4>
+                  <p className="text-body-md text-amber-700 leading-relaxed">
+                    Step up to V1 or rescope time — this combination is not
+                    recommended as a primary deliverable.
+                  </p>
+                </div>
+              </div>
+            )}
+            {pickerResult === "RESCOPE_DONT_TAKE" && (
+              <div className="flex items-start gap-4 p-6 bg-error-container border-2 border-error rounded-xl">
+                <span className="material-symbols-outlined text-error text-2xl flex-shrink-0 mt-0.5 filled">
+                  warning
+                </span>
+                <div>
+                  <h4 className="text-body-md font-bold text-on-error-container font-[family-name:var(--font-sora)] mb-1">
+                    Cannot Proceed
+                  </h4>
+                  <p className="text-body-md text-on-error-container leading-relaxed">
+                    Don&apos;t take this job as-is — rescope the engagement
+                    before continuing.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right sidebar */}

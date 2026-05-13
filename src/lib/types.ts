@@ -1,3 +1,5 @@
+export type Variant = "Full" | "V1" | "V2" | "V3";
+
 export interface AssessmentState {
   blockers: Record<string, "yes" | "no" | null>; // q1..q5
   timeframe: "long" | "medium" | "short" | "sprint" | null;
@@ -5,7 +7,7 @@ export interface AssessmentState {
   clientSpeed: "fast" | "medium" | "slow" | null;
   recruitment: "yes" | "uncertain" | "no" | null;
   personas: 1 | 2 | 3 | null;
-  forcedVariant: string | null;
+  forcedVariant: Variant | "ESCALATE" | null;
 }
 
 export const INITIAL_STATE: AssessmentState = {
