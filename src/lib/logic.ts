@@ -16,6 +16,7 @@ export interface VariantMeta {
   duration: string;
   descriptor: string;
   script: string;
+  notionUrl: string;
 }
 
 export const VARIANT_META: Record<string, VariantMeta> = {
@@ -25,6 +26,7 @@ export const VARIANT_META: Record<string, VariantMeta> = {
     descriptor: "qualitative + quantitative evidence, AI-tested",
     script:
       "You'll get a CJM grounded in qualitative + quantitative evidence across multiple personas, with AI-tested recommendations.",
+    notionUrl: "#", // TODO: replace with actual Notion link
   },
   V1: {
     label: "V1 — Lean",
@@ -32,6 +34,7 @@ export const VARIANT_META: Record<string, VariantMeta> = {
     descriptor: "qualitatively-grounded, one persona",
     script:
       "You'll get a qualitatively-grounded CJM for one persona. Pain points are confirmed through customer interviews and existing data, but not quantified at scale. If you later want statistical validation, a Pollfish add-on is available.",
+    notionUrl: "#", // TODO: replace with actual Notion link
   },
   V2: {
     label: "V2 — Rapid",
@@ -39,6 +42,7 @@ export const VARIANT_META: Record<string, VariantMeta> = {
     descriptor: "directional, limited interviews",
     script:
       "You'll get a directional CJM built from limited interviews and stakeholder input. It's appropriate as a strategic input or refresh. Any pain point not confirmed in interviews is flagged as a hypothesis requiring validation.",
+    notionUrl: "#", // TODO: replace with actual Notion link
   },
   V3: {
     label: "V3 — Workshop",
@@ -46,6 +50,7 @@ export const VARIANT_META: Record<string, VariantMeta> = {
     descriptor: "AS-IS hypothesis map, no primary research",
     script:
       "You'll get an AS-IS hypothesis map — a cross-functional alignment artefact, not a research finding. The top 3 assumptions we couldn't validate will be flagged as candidates for a follow-up sprint.",
+    notionUrl: "#", // TODO: replace with actual Notion link
   },
 };
 

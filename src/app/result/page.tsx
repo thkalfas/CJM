@@ -1,18 +1,27 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useAssessment } from "@/context/AssessmentContext";
 import { calculateVariant, getModifierRows, VARIANT_META } from "@/lib/logic";
 import TopBar from "@/components/TopBar";
 import BottomNav from "@/components/BottomNav";
 import { clsx } from "clsx";
-import { useState } from "react";
 
 export default function ResultPage() {
   const router = useRouter();
   const { state, resetState } = useAssessment();
-  const [copied, setCopied] = useState(false);
-  const [shared, setShared] = useState(false);
+
+  // Guard: must have forced variant (from blockers) OR completed reality check
+  const realityComplete =
+    state.clientSpeed !== null &&
+    state.recruitment !== null &&
+    state.personas !== null;
+  useEffect(() => {
+    if (!state.forcedVariant && !realityComplete) {
+      router.replace("/blockers");
+    }
+  }, [state.forcedVariant, realityComplete, router]);
 
   const isEscalate = state.forcedVariant === "ESCALATE";
   const variant = calculateVariant(state);
@@ -45,29 +54,6 @@ export default function ResultPage() {
         : state.personas === 3
           ? "3+"
           : "—";
-
-  function copyScript() {
-    navigator.clipboard.writeText(meta.script).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  }
-
-  function shareResult() {
-    const payload = {
-      title: "CJM Framework Result",
-      text: `Recommended variant: ${meta.label}`,
-      url: window.location.href,
-    };
-    if (navigator.share) {
-      navigator.share(payload);
-    } else {
-      navigator.clipboard.writeText(window.location.href).then(() => {
-        setShared(true);
-        setTimeout(() => setShared(false), 2000);
-      });
-    }
-  }
 
   function restartAssessment() {
     resetState();
@@ -160,15 +146,6 @@ export default function ResultPage() {
                 </h1>
               </div>
               <div className="hidden md:flex items-center gap-4">
-                <button
-                  onClick={shareResult}
-                  className="bg-secondary text-on-secondary py-3 px-8 rounded-xl text-label-md font-bold uppercase tracking-wider hover:shadow-lg hover:shadow-secondary/25 active:scale-[0.98] transition-all flex items-center gap-2"
-                >
-                  <span className="material-symbols-outlined text-sm">
-                    {shared ? "check" : "share"}
-                  </span>
-                  {shared ? "Link Copied!" : "Share Result"}
-                </button>
                 <button
                   onClick={restartAssessment}
                   className="border-2 border-outline text-on-surface py-3 px-8 rounded-xl text-label-md font-bold uppercase tracking-wider hover:bg-surface-container-low transition-all flex items-center gap-2"
@@ -307,15 +284,17 @@ export default function ResultPage() {
                     </p>
                   </div>
                   <div className="mt-6 flex justify-end">
-                    <button
-                      onClick={copyScript}
+                    <a
+                      href={meta.notionUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="flex items-center gap-2 text-label-md font-bold text-secondary py-3 px-6 rounded-xl hover:bg-secondary/5 transition-colors border border-transparent hover:border-secondary/20 uppercase tracking-wider"
                     >
                       <span className="material-symbols-outlined text-sm">
-                        {copied ? "check" : "content_copy"}
+                        open_in_new
                       </span>
-                      {copied ? "Copied!" : "Copy Script"}
-                    </button>
+                      View in Notion
+                    </a>
                   </div>
                 </div>
               </div>
@@ -323,15 +302,6 @@ export default function ResultPage() {
 
             {/* Mobile-only footer actions */}
             <div className="md:hidden flex flex-col gap-4 pt-8">
-              <button
-                onClick={shareResult}
-                className="bg-secondary text-on-secondary py-5 rounded-xl text-label-md font-bold uppercase tracking-wider hover:shadow-lg transition-all flex items-center justify-center gap-3"
-              >
-                <span className="material-symbols-outlined">
-                  {shared ? "check" : "share"}
-                </span>
-                {shared ? "Link Copied!" : "Share Result"}
-              </button>
               <button
                 onClick={restartAssessment}
                 className="border-2 border-outline text-on-surface py-5 rounded-xl text-label-md font-bold uppercase tracking-wider hover:bg-surface-container-low transition-all flex items-center justify-center gap-3"

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useAssessment } from "@/context/AssessmentContext";
 import { calculateVariant, getModifierRows, VARIANT_META } from "@/lib/logic";
 import TopBar from "@/components/TopBar";
@@ -64,6 +65,13 @@ export default function RealityPage() {
   const router = useRouter();
   const { state, setState } = useAssessment();
 
+  // Guard: picker must be completed (timeframe + outputUse selected)
+  useEffect(() => {
+    if (!state.timeframe || !state.outputUse) {
+      router.replace("/picker");
+    }
+  }, [state.timeframe, state.outputUse, router]);
+
   const allAnswered =
     state.clientSpeed !== null &&
     state.recruitment !== null &&
@@ -95,11 +103,16 @@ export default function RealityPage() {
           <div className="lg:col-span-8 space-y-12">
             {/* 3A: Client Responsiveness */}
             <section>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-2 h-8 bg-primary rounded-full" />
-                <h3 className="text-headline-md text-primary font-[family-name:var(--font-sora)]">
-                  3A: Client Responsiveness
-                </h3>
+              <div className="mb-6">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-2 h-8 bg-primary rounded-full" />
+                  <h3 className="text-headline-md text-primary font-[family-name:var(--font-sora)]">
+                    3A: Client Responsiveness
+                  </h3>
+                </div>
+                <p className="text-body-md text-on-surface-variant italic ml-5">
+                  How fast does the client typically reply and make decisions?
+                </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {speedOptions.map((opt) => {
@@ -153,11 +166,16 @@ export default function RealityPage() {
 
             {/* 3B: Recruitment Feasibility */}
             <section>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-2 h-8 bg-secondary rounded-full" />
-                <h3 className="text-headline-md text-secondary font-[family-name:var(--font-sora)]">
-                  3B: Recruitment Feasibility
-                </h3>
+              <div className="mb-6">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-2 h-8 bg-secondary rounded-full" />
+                  <h3 className="text-headline-md text-secondary font-[family-name:var(--font-sora)]">
+                    3B: Recruitment Feasibility
+                  </h3>
+                </div>
+                <p className="text-body-md text-on-surface-variant italic ml-5">
+                  Can we realistically recruit the interviews we need, in the first 40% of the timeline?
+                </p>
               </div>
               <div className="bg-surface-container-lowest border border-outline-variant p-6 md:p-8 rounded-2xl shadow-sm">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
@@ -206,11 +224,16 @@ export default function RealityPage() {
 
             {/* 3C: Journey Coverage */}
             <section>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-2 h-8 bg-surface-tint rounded-full" />
-                <h3 className="text-headline-md text-surface-tint font-[family-name:var(--font-sora)]">
-                  3C: Journey Coverage
-                </h3>
+              <div className="mb-6">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-2 h-8 bg-surface-tint rounded-full" />
+                  <h3 className="text-headline-md text-surface-tint font-[family-name:var(--font-sora)]">
+                    3C: Journey Coverage
+                  </h3>
+                </div>
+                <p className="text-body-md text-on-surface-variant italic ml-5">
+                  How many distinct journeys / personas need mapping?
+                </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 {personaOptions.map((opt) => {
@@ -278,7 +301,7 @@ export default function RealityPage() {
             {/* Adjusted Outcome card */}
             <div className="bg-secondary-container p-6 md:p-8 rounded-3xl shadow-2xl border-b-8 border-secondary overflow-hidden relative">
               <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
-              <div className="flex justify-between items-start mb-8 relative z-10">
+              <div className="flex justify-between items-start relative z-10">
                 <div>
                   <p className="text-[10px] text-on-secondary-fixed-variant uppercase tracking-[0.3em] font-black font-[family-name:var(--font-sora)]">
                     Adjusted Outcome
@@ -293,30 +316,8 @@ export default function RealityPage() {
                   </span>
                 </div>
               </div>
-              {allAnswered && modifiers.length > 0 && (
-                <div className="space-y-4 relative z-10">
-                  {modifiers.map((mod) => (
-                    <div
-                      key={mod.label}
-                      className="flex items-center gap-4 py-3 px-5 bg-white/50 rounded-xl backdrop-blur-md border border-white/40"
-                    >
-                      <span className="material-symbols-outlined text-secondary font-bold">
-                        {mod.shift > 0
-                          ? "arrow_upward"
-                          : mod.shift < 0
-                            ? "arrow_downward"
-                            : "check_circle"}
-                      </span>
-                      <span className="text-on-secondary-fixed-variant font-bold text-sm">
-                        {mod.note} ({mod.shift > 0 ? "+" : ""}
-                        {mod.shift === -99 ? "force V3" : mod.shift})
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
               {!allAnswered && (
-                <p className="text-sm text-on-secondary-fixed-variant/60 italic relative z-10">
+                <p className="text-sm text-on-secondary-fixed-variant/60 italic relative z-10 mt-4">
                   Answer all questions to see the adjusted outcome.
                 </p>
               )}

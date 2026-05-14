@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useAssessment } from "@/context/AssessmentContext";
 import { getBaseResult } from "@/lib/logic";
 import TopBar from "@/components/TopBar";
@@ -57,6 +58,16 @@ const proTips: Record<string, string> = {
 export default function PickerPage() {
   const router = useRouter();
   const { state, setState } = useAssessment();
+
+  // Guard: blockers must be completed and no forced variant
+  const blockersComplete = ["q1", "q2", "q3", "q4", "q5"].every(
+    (k) => state.blockers[k] !== null
+  );
+  useEffect(() => {
+    if (!blockersComplete || state.forcedVariant) {
+      router.replace("/blockers");
+    }
+  }, [blockersComplete, state.forcedVariant, router]);
 
   const bothSelected = state.timeframe !== null && state.outputUse !== null;
   const pickerResult =
