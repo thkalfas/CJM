@@ -48,7 +48,10 @@ export default function BlockersPage() {
   function setAnswer(id: string, value: "yes" | "no") {
     setState((prev) => ({
       ...prev,
-      blockers: { ...prev.blockers, [id]: value },
+      blockers: {
+        ...prev.blockers,
+        [id]: prev.blockers[id] === value ? null : value,
+      },
     }));
   }
 
@@ -74,7 +77,7 @@ export default function BlockersPage() {
   return (
     <>
       <TopBar />
-      <main className="flex-grow pt-24 md:pt-28 pb-32 md:pb-12 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full">
+      <main className="flex-grow pt-24 md:pt-28 pb-44 md:pb-32 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left sidebar */}
           <div className="lg:col-span-4 lg:sticky lg:top-28 space-y-8">
@@ -170,37 +173,32 @@ export default function BlockersPage() {
               ))}
             </div>
 
-            {/* Ready to proceed footer */}
-            <div className="mt-12">
-              <div className="bg-surface-container-lowest p-6 md:p-8 rounded-xl border-2 border-dashed border-outline-variant flex flex-col md:flex-row items-center justify-between gap-6">
-                <div>
-                  <p className="text-headline-md text-on-surface font-[family-name:var(--font-sora)]">
-                    Ready to Proceed?
-                  </p>
-                  <p className="text-body-md text-outline">
-                    Please confirm all answers are final before continuing.
-                  </p>
-                </div>
-                <button
-                  onClick={handleContinue}
-                  disabled={!allAnswered}
-                  className={clsx(
-                    "px-10 py-4 text-headline-md rounded-xl uppercase tracking-widest transition-all shadow-lg hover:scale-[1.02] active:scale-95 font-[family-name:var(--font-sora)] flex-shrink-0",
-                    allAnswered
-                      ? "bg-primary text-on-primary cursor-pointer"
-                      : "bg-outline text-white cursor-not-allowed opacity-50"
-                  )}
-                >
-                  Continue
-                </button>
-              </div>
-              <p className="text-center text-label-sm text-outline mt-4">
-                Required: {answeredCount(blockers)} of 5 questions answered
-              </p>
-            </div>
+            {/* Spacer for sticky footer */}
+            <div className="h-8" />
           </div>
         </div>
       </main>
+      {/* Sticky footer */}
+      <div className="fixed bottom-16 md:bottom-0 left-0 w-full bg-surface-container-lowest border-t border-outline-variant py-4 md:py-5 px-4 md:px-12 z-40 shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.1)]">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          <p className="text-label-sm text-outline">
+            {answeredCount(blockers)} of 5 answered
+          </p>
+          <button
+            onClick={handleContinue}
+            disabled={!allAnswered}
+            className={clsx(
+              "px-10 py-3 rounded-full font-bold text-label-md uppercase tracking-widest transition-all shadow-lg active:scale-95",
+              allAnswered
+                ? "bg-primary text-on-primary hover:bg-primary-container shadow-primary/25"
+                : "bg-outline text-white opacity-50 cursor-not-allowed"
+            )}
+          >
+            Continue
+          </button>
+        </div>
+      </div>
+
       <BottomNav />
     </>
   );

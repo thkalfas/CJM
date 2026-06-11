@@ -4,27 +4,6 @@ import { useRouter } from "next/navigation";
 import TopBar from "@/components/TopBar";
 import BottomNav from "@/components/BottomNav";
 
-const steps = [
-  {
-    number: "1",
-    title: "Rapid Analysis",
-    description:
-      "For projects that need to move fast. We strip away the complexity to find the fastest path to value.",
-  },
-  {
-    number: "2",
-    title: "Rigorous Path",
-    description:
-      "High-stakes change requires deep data and stakeholder alignment. Our most comprehensive approach.",
-  },
-  {
-    number: "3",
-    title: "Framework v2.4",
-    description:
-      "The underlying technical architecture that powers every intervention we design.",
-  },
-];
-
 export default function StartPage() {
   const router = useRouter();
 
@@ -62,9 +41,6 @@ export default function StartPage() {
               <div className="flex flex-col gap-12 lg:gap-16">
                 {/* Step 0 — Start Assessment */}
                 <div className="flex flex-col gap-4 relative">
-                  <div className="w-12 h-12 rounded-full bg-white text-primary flex items-center justify-center font-extrabold text-xl shadow-lg z-10 font-[family-name:var(--font-sora)]">
-                    0
-                  </div>
                   <div>
                     <h3 className="text-2xl lg:text-3xl font-bold mb-3 font-[family-name:var(--font-sora)]">
                       Start Assessment
@@ -83,31 +59,7 @@ export default function StartPage() {
                       </span>
                     </button>
                   </div>
-                  <div className="absolute left-6 top-12 w-[2px] h-16 lg:h-20 bg-white/20" />
                 </div>
-
-                {/* Steps 1–3 */}
-                {steps.map((step, i) => (
-                  <div
-                    key={step.number}
-                    className="flex flex-col gap-4 relative"
-                  >
-                    <div className="w-12 h-12 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-extrabold text-xl z-10 font-[family-name:var(--font-sora)]">
-                      {step.number}
-                    </div>
-                    <div>
-                      <h3 className="text-2xl lg:text-3xl font-bold mb-3 font-[family-name:var(--font-sora)]">
-                        {step.title}
-                      </h3>
-                      <p className="text-base opacity-90 leading-relaxed max-w-md">
-                        {step.description}
-                      </p>
-                    </div>
-                    {i < steps.length - 1 && (
-                      <div className="absolute left-6 top-12 w-[2px] h-16 lg:h-20 bg-white/20" />
-                    )}
-                  </div>
-                ))}
               </div>
             </div>
           </section>

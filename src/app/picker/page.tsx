@@ -59,15 +59,15 @@ export default function PickerPage() {
   const router = useRouter();
   const { state, setState } = useAssessment();
 
-  // Guard: blockers must be completed and no forced variant
+  // Guard: blockers must be completed
   const blockersComplete = ["q1", "q2", "q3", "q4", "q5"].every(
     (k) => state.blockers[k] !== null
   );
   useEffect(() => {
-    if (!blockersComplete || state.forcedVariant) {
+    if (!blockersComplete) {
       router.replace("/blockers");
     }
-  }, [blockersComplete, state.forcedVariant, router]);
+  }, [blockersComplete, router]);
 
   const bothSelected = state.timeframe !== null && state.outputUse !== null;
   const pickerResult =
@@ -115,7 +115,7 @@ export default function PickerPage() {
                     <button
                       key={opt.value}
                       onClick={() =>
-                        setState((prev) => ({ ...prev, timeframe: opt.value }))
+                        setState((prev) => ({ ...prev, timeframe: prev.timeframe === opt.value ? null : opt.value }))
                       }
                       className={clsx(
                         "flex flex-col p-4 md:p-5 rounded-lg text-left transition-all",
@@ -166,7 +166,7 @@ export default function PickerPage() {
                     <button
                       key={opt.value}
                       onClick={() =>
-                        setState((prev) => ({ ...prev, outputUse: opt.value }))
+                        setState((prev) => ({ ...prev, outputUse: prev.outputUse === opt.value ? null : opt.value }))
                       }
                       className={clsx(
                         "relative p-5 bg-surface-container-lowest rounded-xl flex flex-col justify-between text-left transition-all h-full",

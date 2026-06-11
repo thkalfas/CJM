@@ -83,7 +83,7 @@ export default function RealityPage() {
   return (
     <>
       <TopBar />
-      <main className="flex-grow pt-24 md:pt-28 pb-32 md:pb-12 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full">
+      <main className="flex-grow pt-24 md:pt-28 pb-44 md:pb-32 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full">
         {/* Header */}
         <section className="mb-8 md:mb-12">
           <span className="text-label-sm text-primary uppercase tracking-widest font-bold">
@@ -341,25 +341,42 @@ export default function RealityPage() {
               </p>
             </div>
 
-            {/* Finalize button */}
+          </div>
+        </div>
+      </main>
+      {/* Sticky footer */}
+      <div className="fixed bottom-16 md:bottom-0 left-0 w-full bg-surface-container-lowest border-t border-outline-variant py-4 md:py-5 px-4 md:px-12 z-40 shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.1)]">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          <div className="flex items-center gap-6">
+            {allAnswered && (
+              <span className="text-label-sm text-primary font-bold">
+                {VARIANT_META[variant]?.label ?? variant}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.push("/picker")}
+              className="border-2 border-outline text-on-surface px-8 py-3 rounded-full font-bold text-label-md uppercase tracking-widest hover:bg-surface-container-low transition-all"
+            >
+              Back
+            </button>
             <button
               onClick={() => allAnswered && router.push("/result")}
               disabled={!allAnswered}
               className={clsx(
-                "w-full py-5 md:py-6 px-8 md:px-10 rounded-2xl text-label-md font-black uppercase tracking-widest flex justify-between items-center transition-all shadow-xl active:scale-95 font-[family-name:var(--font-sora)] group",
+                "px-10 py-3 rounded-full font-bold text-label-md uppercase tracking-widest transition-all shadow-lg active:scale-95",
                 allAnswered
-                  ? "bg-primary text-on-primary hover:bg-surface-tint hover:shadow-2xl"
+                  ? "bg-primary text-on-primary hover:bg-primary-container shadow-primary/25"
                   : "bg-outline text-white opacity-50 cursor-not-allowed"
               )}
             >
-              <span>Finalize & See Result</span>
-              <span className="material-symbols-outlined group-hover:translate-x-2 transition-transform">
-                arrow_forward
-              </span>
+              Continue
             </button>
           </div>
         </div>
-      </main>
+      </div>
+
       <BottomNav />
     </>
   );

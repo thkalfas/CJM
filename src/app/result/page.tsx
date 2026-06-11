@@ -37,6 +37,15 @@ export default function ResultPage() {
           ? "Slow"
           : "—";
 
+  const speedDesc =
+    state.clientSpeed === "fast"
+      ? "Replies within 24h, decisions within 48h"
+      : state.clientSpeed === "medium"
+        ? "Replies 2–3 days, single-person bottleneck"
+        : state.clientSpeed === "slow"
+          ? "Silent / unpredictable / approvals by committee"
+          : null;
+
   const recruitLabel =
     state.recruitment === "yes"
       ? "Ready"
@@ -45,6 +54,15 @@ export default function ResultPage() {
         : state.recruitment === "no"
           ? "No"
           : "—";
+
+  const recruitDesc =
+    state.recruitment === "yes"
+      ? "Customer list available, consent sorted"
+      : state.recruitment === "uncertain"
+        ? "List exists but no consent yet"
+        : state.recruitment === "no"
+          ? "Can't recruit in time"
+          : null;
 
   const personaLabel =
     state.personas === 1
@@ -55,6 +73,15 @@ export default function ResultPage() {
           ? "3+"
           : "—";
 
+  const personaDesc =
+    state.personas === 1
+      ? "Single persona journey"
+      : state.personas === 2
+        ? "Two distinct journeys to map"
+        : state.personas === 3
+          ? "Three or more personas required"
+          : null;
+
   function restartAssessment() {
     resetState();
     router.push("/start");
@@ -63,7 +90,7 @@ export default function ResultPage() {
   return (
     <>
       <TopBar />
-      <main className="flex-grow pt-24 md:pt-28 pb-32 md:pb-12 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full">
+      <main className="flex-grow pt-24 md:pt-28 pb-44 md:pb-32 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full">
         {isEscalate ? (
           <>
             {/* ESCALATE layout */}
@@ -170,20 +197,34 @@ export default function ResultPage() {
                     </h3>
                     <ul className="space-y-4">
                       <li className="flex items-center justify-between border-b border-surface-container-low pb-3">
-                        <span className="text-body-md text-on-surface-variant">
-                          Client Responsiveness
-                        </span>
-                        <span className="text-label-sm font-bold bg-surface-container-high px-2 py-1 rounded">
+                        <div className="flex flex-col">
+                          <span className="text-body-md text-on-surface-variant">
+                            Client Responsiveness
+                          </span>
+                          {speedDesc && (
+                            <span className="text-[11px] text-outline mt-0.5">
+                              {speedDesc}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-label-sm font-bold bg-surface-container-high px-2 py-1 rounded flex-shrink-0 ml-3">
                           {speedLabel}
                         </span>
                       </li>
                       <li className="flex items-center justify-between border-b border-surface-container-low pb-3">
-                        <span className="text-body-md text-on-surface-variant">
-                          Recruitment
-                        </span>
+                        <div className="flex flex-col">
+                          <span className="text-body-md text-on-surface-variant">
+                            Recruitment
+                          </span>
+                          {recruitDesc && (
+                            <span className="text-[11px] text-outline mt-0.5">
+                              {recruitDesc}
+                            </span>
+                          )}
+                        </div>
                         <span
                           className={clsx(
-                            "text-label-sm font-bold px-2 py-1 rounded",
+                            "text-label-sm font-bold px-2 py-1 rounded flex-shrink-0 ml-3",
                             state.recruitment === "uncertain" ||
                               state.recruitment === "no"
                               ? "bg-error-container text-on-error-container"
@@ -194,10 +235,17 @@ export default function ResultPage() {
                         </span>
                       </li>
                       <li className="flex items-center justify-between border-b border-surface-container-low pb-3">
-                        <span className="text-body-md text-on-surface-variant">
-                          Personas
-                        </span>
-                        <span className="text-label-sm font-bold bg-surface-container-high px-2 py-1 rounded">
+                        <div className="flex flex-col">
+                          <span className="text-body-md text-on-surface-variant">
+                            Personas
+                          </span>
+                          {personaDesc && (
+                            <span className="text-[11px] text-outline mt-0.5">
+                              {personaDesc}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-label-sm font-bold bg-surface-container-high px-2 py-1 rounded flex-shrink-0 ml-3">
                           {personaLabel}
                         </span>
                       </li>
@@ -210,38 +258,6 @@ export default function ResultPage() {
                   </div>
                 </div>
 
-                {/* Internal Note */}
-                {modifiers.length > 0 && (
-                  <div className="bg-tertiary-fixed text-on-tertiary-fixed p-6 rounded-xl shadow-sm border-l-4 border-primary/40">
-                    <h5 className="text-label-md font-bold mb-3 flex items-center gap-2 font-[family-name:var(--font-sora)]">
-                      <span className="material-symbols-outlined text-sm">
-                        push_pin
-                      </span>
-                      Internal Note
-                    </h5>
-                    <div className="space-y-2">
-                      {modifiers.map((mod) => (
-                        <div
-                          key={mod.label}
-                          className="flex items-center gap-2 text-sm"
-                        >
-                          <span className="material-symbols-outlined text-sm">
-                            {mod.shift > 0
-                              ? "arrow_upward"
-                              : mod.shift < 0
-                                ? "arrow_downward"
-                                : "check_circle"}
-                          </span>
-                          <span>
-                            {mod.label}: {mod.note} (
-                            {mod.shift > 0 ? "+" : ""}
-                            {mod.shift === -99 ? "force V3" : mod.shift})
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Right column */}
@@ -313,6 +329,27 @@ export default function ResultPage() {
           </>
         )}
       </main>
+      {/* Sticky footer */}
+      <div className="fixed bottom-16 md:bottom-0 left-0 w-full bg-surface-container-lowest border-t border-outline-variant py-4 md:py-5 px-4 md:px-12 z-40 shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.1)]">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          <button
+            onClick={() => router.push(state.forcedVariant ? "/blockers" : "/reality")}
+            className="border-2 border-outline text-on-surface px-8 py-3 rounded-full font-bold text-label-md uppercase tracking-widest hover:bg-surface-container-low transition-all"
+          >
+            Back
+          </button>
+          <button
+            onClick={restartAssessment}
+            className="flex items-center gap-2 text-label-md font-bold text-on-surface-variant py-3 px-6 rounded-full hover:bg-surface-container-low transition-colors border border-outline-variant uppercase tracking-wider"
+          >
+            <span className="material-symbols-outlined text-sm">
+              restart_alt
+            </span>
+            Restart
+          </button>
+        </div>
+      </div>
+
       <BottomNav />
     </>
   );
