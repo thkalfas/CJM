@@ -45,14 +45,11 @@ export default function TopBar() {
             CJM
           </span>
         </div>
-        <span className="material-symbols-outlined text-primary text-3xl">
-          account_circle
-        </span>
       </div>
 
       {/* Desktop header */}
-      <div className="hidden md:flex justify-between items-center px-8 lg:px-12 h-20">
-        <div className="flex items-center">
+      <div className="hidden md:flex justify-center items-center px-8 lg:px-12 h-20 relative">
+        <div className="absolute left-8 lg:left-12 flex items-center">
           <h1 className="text-xl font-extrabold text-primary tracking-tighter uppercase font-[family-name:var(--font-sora)]">
             CJM Framework
           </h1>
@@ -97,19 +94,6 @@ export default function TopBar() {
           })}
         </nav>
 
-        <div className="flex items-center gap-4">
-          <div className="hidden lg:flex flex-col items-end">
-            <p className="text-label-md font-bold text-on-surface">
-              Project Admin
-            </p>
-            <p className="text-[10px] text-outline uppercase tracking-wider">
-              admin@cjm.frame
-            </p>
-          </div>
-          <span className="material-symbols-outlined text-primary text-3xl">
-            account_circle
-          </span>
-        </div>
       </div>
     </header>
   );

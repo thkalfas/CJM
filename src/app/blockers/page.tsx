@@ -55,21 +55,30 @@ export default function BlockersPage() {
     }));
   }
 
+  const clearPickerReality = {
+    timeframe: null,
+    outputUse: null,
+    clientSpeed: null,
+    recruitment: null,
+    personas: null,
+  } as const;
+
   function handleContinue() {
     if (!allAnswered) return;
     const yesAnswers = ["q1", "q2", "q3", "q4", "q5"].filter(
       (k) => blockers[k] === "yes"
     );
     if (yesAnswers.includes("q3") || yesAnswers.includes("q4")) {
-      setState((prev) => ({ ...prev, forcedVariant: "ESCALATE" }));
+      setState((prev) => ({ ...prev, ...clearPickerReality, forcedVariant: "ESCALATE" }));
       router.push("/result");
     } else if (yesAnswers.includes("q5")) {
-      setState((prev) => ({ ...prev, forcedVariant: "Full" }));
+      setState((prev) => ({ ...prev, ...clearPickerReality, forcedVariant: "Full" }));
       router.push("/result");
     } else if (yesAnswers.includes("q1") || yesAnswers.includes("q2")) {
-      setState((prev) => ({ ...prev, forcedVariant: "V3" }));
+      setState((prev) => ({ ...prev, ...clearPickerReality, forcedVariant: "V3" }));
       router.push("/result");
     } else {
+      setState((prev) => ({ ...prev, forcedVariant: null }));
       router.push("/picker");
     }
   }
