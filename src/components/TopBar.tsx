@@ -27,15 +27,11 @@ export default function TopBar() {
     state.recruitment !== null &&
     state.personas !== null;
 
-  // Once you've reached a step, all previous steps stay unlocked
-  const reachedResult = hasForced || realityComplete;
-  const reachedPicker = pickerComplete || reachedResult;
-
   function isUnlocked(href: string): boolean {
     if (href === "/start" || href === "/blockers") return true;
-    if (href === "/picker") return blockersComplete && (reachedPicker || !hasForced);
-    if (href === "/reality") return pickerComplete || reachedResult;
-    if (href === "/result") return reachedResult;
+    if (href === "/picker") return blockersComplete && (pickerComplete || !hasForced);
+    if (href === "/reality") return pickerComplete;
+    if (href === "/result") return hasForced || realityComplete;
     return false;
   }
 

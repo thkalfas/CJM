@@ -28,6 +28,34 @@ export default function ResultPage() {
   const modifiers = getModifierRows(state);
   const meta = VARIANT_META[variant] ?? VARIANT_META["V3"];
 
+  const blockerQuestions: { id: string; short: string }[] = [
+    { id: "q1", short: "Regulatory / legal prohibition" },
+    { id: "q2", short: "End-customer unreachable" },
+    { id: "q3", short: "Internal team unavailable" },
+    { id: "q4", short: "Zero prior research / data" },
+    { id: "q5", short: "High-stakes decision" },
+  ];
+
+  const timeframeLabel =
+    state.timeframe === "long"
+      ? ">=3 weeks"
+      : state.timeframe === "medium"
+        ? "4–6 days"
+        : state.timeframe === "short"
+          ? "2–3 days"
+          : state.timeframe === "sprint"
+            ? "<=1 day"
+            : null;
+
+  const outputUseLabel =
+    state.outputUse === "strategic"
+      ? "Strategic"
+      : state.outputUse === "internal"
+        ? "Internal"
+        : state.outputUse === "deliverable"
+          ? "Deliverable"
+          : null;
+
   const speedLabel =
     state.clientSpeed === "fast"
       ? "Fast"
@@ -172,17 +200,6 @@ export default function ResultPage() {
                   Final Result
                 </h1>
               </div>
-              <div className="hidden md:flex items-center gap-4">
-                <button
-                  onClick={restartAssessment}
-                  className="border-2 border-outline text-on-surface py-3 px-8 rounded-xl text-label-md font-bold uppercase tracking-wider hover:bg-surface-container-low transition-all flex items-center gap-2"
-                >
-                  <span className="material-symbols-outlined text-sm">
-                    restart_alt
-                  </span>
-                  Restart
-                </button>
-              </div>
             </div>
 
             {/* Main grid */}
@@ -251,13 +268,103 @@ export default function ResultPage() {
                       </li>
                     </ul>
                   </div>
-                  <div className="mt-8 hidden lg:block">
-                    <span className="material-symbols-outlined text-outline-variant text-5xl">
-                      account_tree
-                    </span>
-                  </div>
                 </div>
 
+                {/* Your Selections */}
+                <div className="bg-surface-container-lowest border border-outline-variant p-6 md:p-8 rounded-xl shadow-sm">
+                  <h3 className="text-label-md text-primary font-bold mb-6 font-[family-name:var(--font-sora)]">
+                    Your Selections
+                  </h3>
+
+                  {/* Blockers */}
+                  <div className="mb-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="material-symbols-outlined text-on-surface-variant text-lg">rule</span>
+                      <span className="text-label-sm text-on-surface font-bold uppercase tracking-wider">Blockers</span>
+                    </div>
+                    <div className="space-y-1.5">
+                      {blockerQuestions.map((q) => {
+                        const answer = state.blockers[q.id];
+                        return (
+                          <div key={q.id} className="flex items-center justify-between">
+                            <span className="text-body-md text-on-surface-variant">{q.short}</span>
+                            <span
+                              className={clsx(
+                                "text-label-sm font-bold px-2 py-0.5 rounded",
+                                answer === "yes"
+                                  ? "bg-error-container text-on-error-container"
+                                  : "bg-surface-container-high text-on-surface"
+                              )}
+                            >
+                              {answer === "yes" ? "Yes" : "No"}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Picker */}
+                  {timeframeLabel && outputUseLabel && (
+                    <div className="mb-5 pt-4 border-t border-surface-container-low">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="material-symbols-outlined text-on-surface-variant text-lg">grid_view</span>
+                        <span className="text-label-sm text-on-surface font-bold uppercase tracking-wider">Picker</span>
+                      </div>
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-body-md text-on-surface-variant">Time Available</span>
+                          <span className="text-label-sm font-bold bg-surface-container-high px-2 py-0.5 rounded">
+                            {timeframeLabel}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-body-md text-on-surface-variant">Use of Output</span>
+                          <span className="text-label-sm font-bold bg-surface-container-high px-2 py-0.5 rounded">
+                            {outputUseLabel}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Reality */}
+                  {realityComplete && (
+                    <div className="pt-4 border-t border-surface-container-low">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="material-symbols-outlined text-on-surface-variant text-lg">fact_check</span>
+                        <span className="text-label-sm text-on-surface font-bold uppercase tracking-wider">Reality Check</span>
+                      </div>
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-body-md text-on-surface-variant">Client Speed</span>
+                          <span className="text-label-sm font-bold bg-surface-container-high px-2 py-0.5 rounded">
+                            {speedLabel}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-body-md text-on-surface-variant">Recruitment</span>
+                          <span
+                            className={clsx(
+                              "text-label-sm font-bold px-2 py-0.5 rounded",
+                              state.recruitment === "uncertain" || state.recruitment === "no"
+                                ? "bg-error-container text-on-error-container"
+                                : "bg-surface-container-high text-on-surface"
+                            )}
+                          >
+                            {recruitLabel}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-body-md text-on-surface-variant">Personas</span>
+                          <span className="text-label-sm font-bold bg-surface-container-high px-2 py-0.5 rounded">
+                            {personaLabel}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Right column */}
